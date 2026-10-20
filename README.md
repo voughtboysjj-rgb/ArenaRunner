@@ -20,6 +20,7 @@
 | Save | بهترین رکورد در `USaveGame` می‌ماند؛ تاریخچه‌ی ران‌ها در `UGameInstance` |
 | ورودی | Input Manager کلاسیک (بدون نیاز به asset‌های Enhanced Input) — کیبورد + گیم‌پد |
 | کانفیگ | `DefaultEngine/Game/Input.ini` آماده؛ GameMode/GameInstance/HUD از قبل وصل شده‌اند |
+| **وب (WebGL)** | نسخه‌ی مرورگری مستقل با بلوم، کمبو، ۳ نوع دشمن، باس، آپگرید — `docs/index.html` |
 | **اندروید** | کنترل لمسی کامل (استیک شناور + ناحیه‌ی دوربین + دکمه‌های Jump/Run)، HUD مقیاس‌پذیر، تنظیمات پکیجینگ Android از قبل در `DefaultEngine.ini` |
 
 ## پیش‌نیازها
@@ -166,61 +167,61 @@ adb install -r Build/Android/ArenaRunner-arm64.apk
 
 ## نسخه‌ی وب (مرورگر) 🌐
 
-**اول یک واقعیت مهم:** آنریل انجین ۵ **خروجی HTML5 ندارد**. پشتیبانی وب از UE 4.24 از موتور حذف شد و در UE5 هیچ هدف بیلد وبی وجود ندارد؛ تنها راه رسمی، **Pixel Streaming** است (بیلد واقعی UE روی سرور GPU اجرا و تصویرش با WebRTC به مرورگر استریم می‌شود — نیازمند سرور پولی، نه یک فایل HTML).
+**اول یک واقعیت مهم:** آنریل انجین ۵ **خروجی HTML5 ندارد**. پشتیبانی وب از UE 4.24 از موتور حذف شد و در UE5 هیچ هدف بیلد وبی نیست؛ تنها راه رسمی **Pixel Streaming** است (بیلد واقعی UE روی سرور GPU + WebRTC — نیازمند سرور پولی).
 
-به همین دلیل، در پوشه‌ی `docs/` یک **نسخه‌ی وبِ کامل از همین بازی** با WebGL/Three.js هست:
+به همین دلیل نسخه‌ی وب یک **پیاده‌سازی مستقل با WebGL2/Three.js** است که همین حالا روی GitHub Pages اجرا می‌شود:
+**https://voughtboysjj-rgb.github.io/ArenaRunner/**
 
-| | |
+### چه چیزی در نسخه‌ی وب هست
+
+| دسته | جزئیات |
 |---|---|
-| فایل | `docs/index.html` — **تک‌فایل و آفلاین** (کتابخانه‌ی Three.js داخل همان فایل embed شده) |
-| موتور | WebGL2 (Three.js r160) |
-| چیزهایی که یکسان است | آرنای گرد، کورهای انرژی، هانترهای تعقیب‌گر، ویوها، امتیاز و بهترین رکورد (localStorage)، آسیب/ناک‌بک/ریجن، مینی‌مپ، وینیت خطر |
-| کنترل | دسکتاپ: `WASD` + ماوس (Pointer Lock) + `Space` + `Shift` + `P` — موبایل: استیک شناور (نیمه‌ی چپ) + کشیدن نیمه‌ی راست + دکمه‌های `JUMP` / `RUN` |
-| صدا | افکت‌های کوتاه با WebAudio (بدون فایل صوتی) |
+| رندر | **بلوم واقعی** (پُست‌پروسس دست‌نویس با رِندرتارگت HalfFloat)، tone mapping ACES، شیدر کف درخشان، آسمان گرادیانی، سایه‌های نرم، گرد و غبار حجمی |
+| کاراکتر | انیمیشن **رویه‌ای** (دویدن، پرش، فرود با squash، چرخش کمر، ضربه‌ی شمشیر)، تیغه‌ی نورانی، حلقه‌ی انرژی |
+| حس بازی | **screen shake**، **hit-stop**، fov-kick هنگام دش، ذرات additive، فلاش ضربه، آرک شمشیر، وینیت خطر، تیلت دوربین |
+| مبارزه | کمبوی ۳ ضربه (ضربه‌ی سوم سنگین)، **بافر ورودی** حمله، دش با i-frame، کول‌داون |
+| دشمن‌ها | `Hunter` (تعقیب)، `Charger` (شارژ + تلگراف قرمز)، `Spitter` (گلوله‌ی پلاسما)، **`Warden` باس** هر ۵ ویو با شوک‌ویو و احضار |
+| پیشرفت | کمبو با ضریب تا `x2.1`، **آپگرید بین ویوها** (۸ کارت، ۳ تایی تصادفی)، بهترین رکورد |
+| صدا | کامل **رویه‌ای با WebAudio** (بدون فایل صوتی) |
+| کنترل | دسکتاپ: `WASD` + ماوس (Pointer Lock) + کلیک‌چپ حمله + `Space` + `Shift` + `Q`/کلیک‌راست دش + `P` · موبایل: استیک شناور + کشیدن + دکمه‌های Attack/Jump/Dash/Run |
+| کارایی | **کیفیت تطبیقی**: اگر FPS بیفتد، رزولوشن و بلوم/سایه خودکار کم می‌شوند |
 
-### اجرا
+### اجرا و بیلد
 
 ```bash
-# ۱) بدون سرور: فایل را مستقیم باز کن
-open docs/index.html          # macOS
-xdg-open docs/index.html      # Linux
-start docs\index.html         # Windows
+# مستقیم
+open docs/index.html            # macOS
+xdg-open docs/index.html        # Linux
+start docs\index.html           # Windows
 
-# ۲) یا با سرور محلی (برای تست روی گوشی در همان وای‌فای)
+# یا سرور محلی (تست روی گوشی در همان وای‌فای)
 python3 -m http.server 8080 --directory docs
-# سپس از گوشی: http://<IP-کامپیوتر>:8080
+
+# بعد از هر تغییر در سورس، دوباره بیلد کن:
+python3 Web/build_web.py
 ```
 
-### آنلاین کردن روی GitHub Pages
+ساختار سورس وب:
 
-پوشه‌ی `docs/` عمداً همین‌جا ساخته شده تا با GitHub Pages یک‌کلیکی آنلاین شود:
+```
+Web/index.template.html   ← HTML/CSS/HUD
+Web/src/game.part1.js     ← موتور، پُست‌پروسس، آرنا، ذرات، بازیکن
+Web/src/game.part2.js     ← دشمن‌ها، ویوها، آپگریدها، HUD، ورودی، حلقه‌ی بازی
+Web/src/game.js           ← خروجی ادغام‌شده (auto-generated)
+Web/vendor/three.min.js   ← Three.js r160
+Web/build_web.py          ← اینلاین‌کردن همه‌چیز در docs/index.html
+```
 
-`Repository → Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: main → Folder: /docs → Save`
+> ⚠️ `Web/src/game.js` را دستی ویرایش نکن؛ `part1` و `part2` را ویرایش کن و با اسکریپت بیلد ادغام/بیلد بگیر.
 
-بعد از یکی دو دقیقه بازی روی این آدرس بالا می‌آید:
-`https://<USERNAME>.github.io/ArenaRunner/`
+### آنلاین کردن (GitHub Pages)
 
-### هم‌ارزی تنظیمات
+`Settings → Pages → Source: Deploy from a branch → Branch: main → Folder: /docs` — الان فعال است.
 
-مقادیر بازی در `docs/index.html` داخل آبجکت `CFG` هستند و دقیقاً معادل فیلدهای C++:
+### آنریل واقعی با اَسِت‌های رایگان
 
-| C++ (`ArenaGameMode.h` / `ArenaCharacter.h`) | `CFG` در نسخه‌ی وب |
-|---|---|
-| `ArenaRadius = 1900` | `arenaRadius: 19.0` (هر ۱۰۰ واحد آنریل = ۱ متر) |
-| `BaseCollectibleCount / CollectiblesPerWave` | `coreCount0 / corePerWave` |
-| `ScorePerCollectible / WaveClearBonus` | `scorePerCore / waveBonus` |
-| `FirstHunterWave / MaxHunters` | `hunterFirstWave / hunterMax` |
-| `HunterBaseSpeed / HunterSpeedPerWave / HunterMaxSpeed` | `hunterSpeed / hunterSpeedPerWave / hunterMaxSpeed` |
-| `MaxHealth / HealthRegenPerSecond / KnockBackStrength` | `maxHealth / regen / knockback` |
-
-### اگر واقعاً آنریل را در مرورگر می‌خواهی (Pixel Streaming)
-
-1. پلاگین `PixelStreaming` را در پروژه فعال کن (`Edit → Plugins`)
-2. یک ماشین با GPU (ابر: AWS G4/G5، Azure NV، Paperspace، یا سرور اختصاصی) بگیر
-3. بیلد پکیج‌شده را با `-PixelStreaming` اجرا کن و **Signalling Server** (از مخزن `PixelStreamingInfrastructure` در گیت‌هاب EpicGames) را بالا بیاور
-4. سمت وب، پلیر `pixelstreaming2`/`pixelstreaming` را داخل یک iframe بگذار
-
-هزینه‌ی واقعی: یک سرور GPU حدوداً **۰.۵ تا ۱ دلار در ساعت** برای هر نشست، و هر بازیکن هم‌زمان یک نمونه‌ی رندر می‌خواهد. برای یک نمونه‌ی آموزشی معمولاً ارزشش را ندارد؛ نسخه‌ی WebGL برای همین ساخته شد.
+راهنمای گام‌به‌گام Quixel/Megascans، Mixamo، Fab، Niagara و Post Process + کد آماده‌ی اتصال مش اسکلتی:
+**[Docs/UNREAL_ASSETS.md](Docs/UNREAL_ASSETS.md)**
 
 ## ساختار پروژه
 
@@ -233,7 +234,9 @@ ArenaRunner/
 │  ├─ Android/AndroidEngine.ini  # تنظیمات رندر مخصوص اندروید
 │  └─ DefaultInput.ini           # محورها و اکشن‌ها (کیبورد + گیم‌پد)
 ├─ Content/                      # خالی است: همه‌چیز در کد ساخته می‌شود
-├─ docs/index.html               # نسخه‌ی وب (WebGL/Three.js، تک‌فایل، GitHub Pages)
+├─ docs/index.html               # نسخه‌ی وب بیلد‌شده (تک‌فایل، GitHub Pages)
+├─ Web/                          # سورس نسخه‌ی وب + build_web.py
+├─ Docs/UNREAL_ASSETS.md         # راهنمای ارتقای پروژه‌ی UE با اَسِت‌های رایگان
 └─ Source/
    ├─ ArenaRunner.Target.cs
    ├─ ArenaRunnerEditor.Target.cs
@@ -331,6 +334,8 @@ gh repo create ArenaRunner --public --source=. --remote=origin --push
 - [ ] شلیک پرتابی (Projectile) و سیستم جان دشمن
 - [ ] منوی اصلی و صفحه‌ی پایان با UMG
 - [x] کنترل لمسی و پشتیبانی اندروید
+- [x] نسخه‌ی وب با بلوم/کمبو/باس/آپگرید (`docs/`)
+- [ ] انتقال سیستم‌های وب به C++ آنریل (باس، کمبو، آپگرید)
 - [ ] صدا و افکت ذرات برای جمع‌کردن کور
 - [ ] ذخیره‌ی کامل ران (زمان، ویو، امتیاز) در SaveGame
 
@@ -354,6 +359,7 @@ Collect every cyan energy core to clear the wave; each wave adds more cores and 
 
 Built with `USpringArmComponent` + `UCameraComponent`, an `AHUD`-driven Canvas UI, an `AGameModeBase` run loop with a chasing hazard actor, `USaveGame` persistence and classic Input Manager bindings (`Config/DefaultInput.ini`).
 
-**Web:** Unreal Engine 5 has no HTML5 export target (web support was removed in 4.24; Pixel Streaming is the only official route and needs a GPU server). This repo therefore ships `docs/index.html` — a single-file WebGL/Three.js port of the same game (same arena, waves, hunters, score, touch controls) that runs offline and is ready for GitHub Pages (`Settings → Pages → Branch: main, Folder: /docs`).
+**Web:** Unreal Engine 5 has no HTML5 export target (removed in 4.24; Pixel Streaming is the only official route and needs a GPU server). `docs/index.html` is therefore a standalone WebGL2/Three.js game built from `Web/src/`: real bloom post-processing, procedural character animation, screen shake + hit-stop, 3 hit melee combo with input buffering, dash with i-frames, three enemy types, a boss every 5th wave, between-wave upgrades, procedural WebAudio and adaptive quality. Rebuild with `python3 Web/build_web.py`; it is already live on GitHub Pages.
+**Unreal with real assets:** see `Docs/UNREAL_ASSETS.md` for the step-by-step Quixel/Megascans + Mixamo + Fab + Niagara + post-process pipeline, plus ready-to-paste C++ for swapping the primitive visuals for a skeletal mesh.
 
 **Android:** preconfigured in `Config/DefaultEngine.ini` (`[/Script/AndroidRuntimeSettings.AndroidRuntimeSettings]`: SDK 26/34, arm64, GLES 3.2 + Vulkan shaders, APK with embedded data, AAB enabled). Requires Android Studio Koala 2024.1.2 / SDK 34 / NDK r27c / JDK 21 — the easiest install is **Turnkey**: `Platforms → SDK Management → Android → Install SDK`. Package with `Platforms → Android → Package Project`, or `RunUAT BuildCookRun -platform=Android`. Touch input lives in `AArenaPlayerController` and the on-screen controls are drawn by `AArenaHUD::DrawMobileControls`; set `AArenaHUD::bForceMobileControls` to test the touch layout in PIE.
