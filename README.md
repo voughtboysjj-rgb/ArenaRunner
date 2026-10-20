@@ -164,6 +164,64 @@ adb install -r Build/Android/ArenaRunner-arm64.apk
 | دو جوی‌استیک هم‌زمان | `DefaultTouchInterface=None` در `DefaultInput.ini` حذف نشده باشد |
 | APK روی گوشی نصب نمی‌شود | `MinSDKVersion=26` و معماری `arm64` — شبیه‌سازهای x86 پشتیبانی نمی‌شوند |
 
+## نسخه‌ی وب (مرورگر) 🌐
+
+**اول یک واقعیت مهم:** آنریل انجین ۵ **خروجی HTML5 ندارد**. پشتیبانی وب از UE 4.24 از موتور حذف شد و در UE5 هیچ هدف بیلد وبی وجود ندارد؛ تنها راه رسمی، **Pixel Streaming** است (بیلد واقعی UE روی سرور GPU اجرا و تصویرش با WebRTC به مرورگر استریم می‌شود — نیازمند سرور پولی، نه یک فایل HTML).
+
+به همین دلیل، در پوشه‌ی `docs/` یک **نسخه‌ی وبِ کامل از همین بازی** با WebGL/Three.js هست:
+
+| | |
+|---|---|
+| فایل | `docs/index.html` — **تک‌فایل و آفلاین** (کتابخانه‌ی Three.js داخل همان فایل embed شده) |
+| موتور | WebGL2 (Three.js r160) |
+| چیزهایی که یکسان است | آرنای گرد، کورهای انرژی، هانترهای تعقیب‌گر، ویوها، امتیاز و بهترین رکورد (localStorage)، آسیب/ناک‌بک/ریجن، مینی‌مپ، وینیت خطر |
+| کنترل | دسکتاپ: `WASD` + ماوس (Pointer Lock) + `Space` + `Shift` + `P` — موبایل: استیک شناور (نیمه‌ی چپ) + کشیدن نیمه‌ی راست + دکمه‌های `JUMP` / `RUN` |
+| صدا | افکت‌های کوتاه با WebAudio (بدون فایل صوتی) |
+
+### اجرا
+
+```bash
+# ۱) بدون سرور: فایل را مستقیم باز کن
+open docs/index.html          # macOS
+xdg-open docs/index.html      # Linux
+start docs\index.html         # Windows
+
+# ۲) یا با سرور محلی (برای تست روی گوشی در همان وای‌فای)
+python3 -m http.server 8080 --directory docs
+# سپس از گوشی: http://<IP-کامپیوتر>:8080
+```
+
+### آنلاین کردن روی GitHub Pages
+
+پوشه‌ی `docs/` عمداً همین‌جا ساخته شده تا با GitHub Pages یک‌کلیکی آنلاین شود:
+
+`Repository → Settings → Pages → Build and deployment → Source: Deploy from a branch → Branch: main → Folder: /docs → Save`
+
+بعد از یکی دو دقیقه بازی روی این آدرس بالا می‌آید:
+`https://<USERNAME>.github.io/ArenaRunner/`
+
+### هم‌ارزی تنظیمات
+
+مقادیر بازی در `docs/index.html` داخل آبجکت `CFG` هستند و دقیقاً معادل فیلدهای C++:
+
+| C++ (`ArenaGameMode.h` / `ArenaCharacter.h`) | `CFG` در نسخه‌ی وب |
+|---|---|
+| `ArenaRadius = 1900` | `arenaRadius: 19.0` (هر ۱۰۰ واحد آنریل = ۱ متر) |
+| `BaseCollectibleCount / CollectiblesPerWave` | `coreCount0 / corePerWave` |
+| `ScorePerCollectible / WaveClearBonus` | `scorePerCore / waveBonus` |
+| `FirstHunterWave / MaxHunters` | `hunterFirstWave / hunterMax` |
+| `HunterBaseSpeed / HunterSpeedPerWave / HunterMaxSpeed` | `hunterSpeed / hunterSpeedPerWave / hunterMaxSpeed` |
+| `MaxHealth / HealthRegenPerSecond / KnockBackStrength` | `maxHealth / regen / knockback` |
+
+### اگر واقعاً آنریل را در مرورگر می‌خواهی (Pixel Streaming)
+
+1. پلاگین `PixelStreaming` را در پروژه فعال کن (`Edit → Plugins`)
+2. یک ماشین با GPU (ابر: AWS G4/G5، Azure NV، Paperspace، یا سرور اختصاصی) بگیر
+3. بیلد پکیج‌شده را با `-PixelStreaming` اجرا کن و **Signalling Server** (از مخزن `PixelStreamingInfrastructure` در گیت‌هاب EpicGames) را بالا بیاور
+4. سمت وب، پلیر `pixelstreaming2`/`pixelstreaming` را داخل یک iframe بگذار
+
+هزینه‌ی واقعی: یک سرور GPU حدوداً **۰.۵ تا ۱ دلار در ساعت** برای هر نشست، و هر بازیکن هم‌زمان یک نمونه‌ی رندر می‌خواهد. برای یک نمونه‌ی آموزشی معمولاً ارزشش را ندارد؛ نسخه‌ی WebGL برای همین ساخته شد.
+
 ## ساختار پروژه
 
 ```
@@ -175,6 +233,7 @@ ArenaRunner/
 │  ├─ Android/AndroidEngine.ini  # تنظیمات رندر مخصوص اندروید
 │  └─ DefaultInput.ini           # محورها و اکشن‌ها (کیبورد + گیم‌پد)
 ├─ Content/                      # خالی است: همه‌چیز در کد ساخته می‌شود
+├─ docs/index.html               # نسخه‌ی وب (WebGL/Three.js، تک‌فایل، GitHub Pages)
 └─ Source/
    ├─ ArenaRunner.Target.cs
    ├─ ArenaRunnerEditor.Target.cs
@@ -294,5 +353,7 @@ MIT — فایل [LICENSE](LICENSE). استفاده از موتور آنریل �
 Collect every cyan energy core to clear the wave; each wave adds more cores and one more red chasing **Hunter** (slow, but it hurts). Your best score is saved between sessions.
 
 Built with `USpringArmComponent` + `UCameraComponent`, an `AHUD`-driven Canvas UI, an `AGameModeBase` run loop with a chasing hazard actor, `USaveGame` persistence and classic Input Manager bindings (`Config/DefaultInput.ini`).
+
+**Web:** Unreal Engine 5 has no HTML5 export target (web support was removed in 4.24; Pixel Streaming is the only official route and needs a GPU server). This repo therefore ships `docs/index.html` — a single-file WebGL/Three.js port of the same game (same arena, waves, hunters, score, touch controls) that runs offline and is ready for GitHub Pages (`Settings → Pages → Branch: main, Folder: /docs`).
 
 **Android:** preconfigured in `Config/DefaultEngine.ini` (`[/Script/AndroidRuntimeSettings.AndroidRuntimeSettings]`: SDK 26/34, arm64, GLES 3.2 + Vulkan shaders, APK with embedded data, AAB enabled). Requires Android Studio Koala 2024.1.2 / SDK 34 / NDK r27c / JDK 21 — the easiest install is **Turnkey**: `Platforms → SDK Management → Android → Install SDK`. Package with `Platforms → Android → Package Project`, or `RunUAT BuildCookRun -platform=Android`. Touch input lives in `AArenaPlayerController` and the on-screen controls are drawn by `AArenaHUD::DrawMobileControls`; set `AArenaHUD::bForceMobileControls` to test the touch layout in PIE.
