@@ -192,19 +192,46 @@ void AArenaCharacter::LookUp(float Value)
 
 void AArenaCharacter::BeginSprint()
 {
-	bSprinting = true;
-	if (!bDead)
-	{
-		GetCharacterMovement()->MaxWalkSpeed = SprintSpeed;
-	}
+	SetSprinting(true);
 }
 
 void AArenaCharacter::EndSprint()
 {
-	bSprinting = false;
+	SetSprinting(false);
+}
+
+void AArenaCharacter::SetSprinting(bool bEnabled)
+{
+	bSprinting = bEnabled;
 	if (!bDead)
 	{
-		GetCharacterMovement()->MaxWalkSpeed = WalkSpeed;
+		GetCharacterMovement()->MaxWalkSpeed = bEnabled ? SprintSpeed : WalkSpeed;
+	}
+}
+
+void AArenaCharacter::AddTouchMoveInput(float ForwardAmount, float RightAmount)
+{
+	if (bDead || !Controller)
+	{
+		return;
+	}
+
+	if (FMath::IsNearlyZero(ForwardAmount) && FMath::IsNearlyZero(RightAmount))
+	{
+		return;
+	}
+
+	const FRotator YawOnly(0.f, Controller->GetControlRotation().Yaw, 0.f);
+	const FRotationMatrix YawMatrix(YawOnly);
+	AddMovementInput(YawMatrix.GetUnitAxis(EAxis::X), ForwardAmount);
+	AddMovementInput(YawMatrix.GetUnitAxis(EAxis::Y), RightAmount);
+}
+
+void AArenaCharacter::TouchJump()
+{
+	if (!bDead)
+	{
+		Jump();
 	}
 }
 

@@ -34,6 +34,12 @@ public:
 	/** Teleports the character to the spawn point and restores health / movement. */
 	void ResetForRun(const FVector& Location, const FRotator& Rotation);
 
+	// ---- Touch / UI driven input (used by the on-screen mobile controls) ----
+
+	void AddTouchMoveInput(float ForwardAmount, float RightAmount);
+	void SetSprinting(bool bEnabled);
+	void TouchJump();
+
 	float GetHealth() const { return Health; }
 	float GetMaxHealth() const { return MaxHealth; }
 	float GetHealthPercent() const { return MaxHealth > 0.f ? FMath::Clamp(Health / MaxHealth, 0.f, 1.f) : 0.f; }
